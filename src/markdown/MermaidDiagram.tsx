@@ -48,6 +48,24 @@ export function MermaidDiagram({ code, onError }: MermaidDiagramProps): React.Re
           .replace(/<br>/gi, '<br/>')
           .replace(/\s*<--\s*/g, ' --> ');
 
+        // Timeline/journey: parentheses break Mermaid's parser (they denote sections)
+        // Replace them with brackets in data lines only
+        if (/^\s*(timeline|journey)(\s|$)/im.test(processedCode)) {
+          processedCode = processedCode
+            .split('\n')
+            .map((line) => {
+              const trimmed = line.trim();
+              if (
+                /^\s*(timeline|journey|title|section|%%)/i.test(trimmed) ||
+                trimmed === ''
+              ) {
+                return line;
+              }
+              return line.replace(/\(/g, '[').replace(/\)/g, ']');
+            })
+            .join('\n');
+        }
+
         const { svg: renderedSvg } = await mermaid.render(
           `mermaid-${uniqueId}`,
           processedCode,
