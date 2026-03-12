@@ -93,6 +93,19 @@ const MessageWithControls: React.FC<{
         <div className="rui-message__error">{message.error}</div>
       )}
 
+      {/* Warning (e.g., truncation) */}
+      {message.warning && (
+        <div className="rui-message__warning">{message.warning}</div>
+      )}
+
+      {/* Retry indicator */}
+      {message.retryInfo && message.isStreaming && (
+        <div className="rui-message__retry-indicator">
+          <svg className="rui-message__retry-spinner" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+          <span>Retrying ({message.retryInfo.attempt}/{message.retryInfo.maxAttempts})...</span>
+        </div>
+      )}
+
       {/* Content */}
       {message.content && (
         <div className="rui-message__content">

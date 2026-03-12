@@ -74,6 +74,34 @@
   font-size: 0.8125rem;
 }
 
+/* Warning */
+.rui-message__warning {
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+  background-color: #fffbeb;
+  border: 1px solid #f59e0b;
+  border-radius: 0.375rem;
+  color: #92400e;
+  font-size: 0.8125rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Retry indicator */
+.rui-message__retry-indicator {
+  color: #d97706;
+  font-size: 0.8125rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0;
+}
+.rui-message__retry-spinner {
+  animation: rui-spin 1s linear infinite;
+  flex-shrink: 0;
+}
+
 /* Tool calls container */
 .rui-message__tool-calls {
   margin-bottom: 0.75rem;

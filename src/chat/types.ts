@@ -16,6 +16,10 @@ export interface IChatMessage {
   toolCalls?: IToolCallInfo[];
   /** Error message if the response failed */
   error?: string;
+  /** Retry information if the response is being retried */
+  retryInfo?: { attempt: number; maxAttempts: number };
+  /** Non-fatal warning (e.g., response truncation) */
+  warning?: string;
 }
 
 /** Shared tool call type (superset of both apps) */
