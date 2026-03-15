@@ -10,6 +10,8 @@
 export { MessageList } from './MessageList';
 export { StreamingText } from './StreamingText';
 export { ToolCallCard, InlineToolCall } from './ToolCallCard';
+export { ToolApprovalBanner } from './ToolApprovalBanner';
+export { PermissionRulesList } from './PermissionRulesList';
 export { ExecutionProgress } from './ExecutionProgress';
 export { ChatControls } from './ChatControls';
 export { ExportMessage } from './ExportMessage';
@@ -25,4 +27,9 @@ export type {
   IExportMessageProps,
   IThinkingBlockProps,
   IMessageListProps,
+  IToolApprovalRequest,
+  IToolApprovalDecision,
+  IToolApprovalBannerProps,
+  IPermissionRuleInfo,
+  IPermissionRulesListProps,
 } from './types';

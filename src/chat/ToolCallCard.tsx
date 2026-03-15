@@ -7,7 +7,7 @@
  */
 
 import React, { memo, useState, useCallback } from 'react';
-import { Wrench, Check, AlertCircle, Loader, Clock, ChevronDown, ChevronUp } from 'lucide-react';
+import { Wrench, Check, AlertCircle, Loader, Clock, ChevronDown, ChevronUp, ShieldAlert } from 'lucide-react';
 import type { IToolCallCardProps, IToolCallInfo } from './types';
 
 // Map tool names to categories and colors
@@ -74,6 +74,7 @@ export const ToolCallCard: React.FC<IToolCallCardProps> = memo(
       running: <Loader size={14} className="tool-call__status-icon tool-call__status-icon--spin" />,
       complete: <Check size={14} className="tool-call__status-icon tool-call__status-icon--success" />,
       error: <AlertCircle size={14} className="tool-call__status-icon tool-call__status-icon--error" />,
+      approval_pending: <ShieldAlert size={14} className="tool-call__status-icon tool-call__status-icon--warning" />,
     }[status];
 
     return (

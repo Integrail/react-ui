@@ -28,7 +28,7 @@ export interface IToolCallInfo {
   name: string;
   description?: string;
   args?: Record<string, unknown>;
-  status: 'pending' | 'running' | 'complete' | 'error';
+  status: 'pending' | 'running' | 'complete' | 'error' | 'approval_pending';
   durationMs?: number;
   result?: unknown;
   error?: string;
@@ -84,6 +84,65 @@ export interface IThinkingBlockProps {
   content: string;
   isStreaming?: boolean;
   defaultCollapsed?: boolean;
+  className?: string;
+}
+
+// ============================================================
+// Tool Permission / Approval Types
+// ============================================================
+
+/** Tool approval request data (serializable across IPC) */
+export interface IToolApprovalRequest {
+  requestId: string;
+  toolName: string;
+  args: Record<string, unknown>;
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  approvalMessage?: string;
+  sensitiveArgs?: string[];
+  suggestedScope: 'once' | 'session' | 'persistent';
+  toolCategory?: string;
+  toolSource?: string;
+  description?: string;
+}
+
+/** Approval decision from the user */
+export interface IToolApprovalDecision {
+  requestId: string;
+  approved: boolean;
+  scope: 'once' | 'session' | 'always' | 'never';
+  remember: boolean;
+}
+
+/** Props for ToolApprovalBanner */
+export interface IToolApprovalBannerProps {
+  request: IToolApprovalRequest;
+  onApprove: (decision: IToolApprovalDecision) => void;
+  onDeny: (decision: IToolApprovalDecision) => void;
+  isResponding?: boolean;
+  className?: string;
+}
+
+/** Permission rule for UI display */
+export interface IPermissionRuleInfo {
+  id: string;
+  toolName: string;
+  action: 'allow' | 'deny' | 'ask';
+  conditions?: Array<{ argName: string; operator: string; value: string }>;
+  unconditional: boolean;
+  enabled: boolean;
+  description?: string;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+  expiresAt?: string | null;
+}
+
+/** Props for PermissionRulesList */
+export interface IPermissionRulesListProps {
+  rules: IPermissionRuleInfo[];
+  onToggleRule?: (ruleId: string, enabled: boolean) => void;
+  onDeleteRule?: (ruleId: string) => void;
+  onClearSession?: () => void;
   className?: string;
 }
 
