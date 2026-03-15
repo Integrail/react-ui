@@ -11,7 +11,7 @@ export { MessageList } from './MessageList';
 export { StreamingText } from './StreamingText';
 export { ToolCallCard, InlineToolCall } from './ToolCallCard';
 export { ToolApprovalBanner } from './ToolApprovalBanner';
-export { PermissionRulesList } from './PermissionRulesList';
+export { PermissionRulesList, PermissionRulesEditor } from './PermissionRulesList';
 export { ExecutionProgress } from './ExecutionProgress';
 export { ChatControls } from './ChatControls';
 export { ExportMessage } from './ExportMessage';
@@ -32,4 +32,7 @@ export type {
   IToolApprovalBannerProps,
   IPermissionRuleInfo,
   IPermissionRulesListProps,
+  IPermissionRulesEditorProps,
+  INewPermissionRule,
+  IConditionFormData,
 } from './types';

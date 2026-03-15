@@ -137,9 +137,32 @@ export interface IPermissionRuleInfo {
   expiresAt?: string | null;
 }
 
-/** Props for PermissionRulesList */
+/** Condition form data for the rule editor */
+export interface IConditionFormData {
+  argName: string;
+  operator: string;
+  value: string;
+}
+
+/** New rule data (without server-generated fields) */
+export type INewPermissionRule = Omit<IPermissionRuleInfo, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>;
+
+/** Props for PermissionRulesList (read-only list with toggle/delete) */
 export interface IPermissionRulesListProps {
   rules: IPermissionRuleInfo[];
+  onToggleRule?: (ruleId: string, enabled: boolean) => void;
+  onDeleteRule?: (ruleId: string) => void;
+  onClearSession?: () => void;
+  className?: string;
+}
+
+/** Props for PermissionRulesEditor (full CRUD) */
+export interface IPermissionRulesEditorProps {
+  rules: IPermissionRuleInfo[];
+  /** Tool names for the dropdown (e.g., ['bash', 'write_file', '*']) */
+  availableTools: string[];
+  onAddRule?: (rule: INewPermissionRule) => void;
+  onUpdateRule?: (ruleId: string, updates: Partial<IPermissionRuleInfo>) => void;
   onToggleRule?: (ruleId: string, enabled: boolean) => void;
   onDeleteRule?: (ruleId: string) => void;
   onClearSession?: () => void;
