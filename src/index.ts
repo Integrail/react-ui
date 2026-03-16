@@ -20,5 +20,5 @@ export * from './chat/index';
 // Context Display components
 export * from './context-display/index';
 
-// Plugins (non-React, also available via '@everworker/react-ui/plugins')
-export * from './plugins/index';
+// NOTE: Plugins are NOT re-exported here to avoid pulling @everworker/oneringai
+// into browser/renderer bundles. Import via '@everworker/react-ui/plugins' instead.
