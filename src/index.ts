@@ -19,3 +19,6 @@ export * from './chat/index';
 
 // Context Display components
 export * from './context-display/index';
+
+// Plugins (non-React, also available via '@everworker/react-ui/plugins')
+export * from './plugins/index';

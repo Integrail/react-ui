@@ -21,7 +21,17 @@
     "./styles/markdown": "./dist/markdown.css",
     "./styles/chat": "./dist/chat.css",
     "./styles/thinking": "./dist/thinking.css",
-    "./styles/context-display": "./dist/context-display.css"
+    "./styles/context-display": "./dist/context-display.css",
+    "./plugins": {
+      "import": {
+        "types": "./dist/plugins.d.ts",
+        "default": "./dist/plugins.js"
+      },
+      "require": {
+        "types": "./dist/plugins.d.cts",
+        "default": "./dist/plugins.cjs"
+      }
+    }
   },
   "files": [
     "dist"
