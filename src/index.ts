@@ -20,5 +20,8 @@ export * from './chat/index';
 // Context Display components
 export * from './context-display/index';
 
+// Export services (PDF/DOCX)
+export * from './export/index';
+
 // NOTE: Plugins are NOT re-exported here to avoid pulling @everworker/oneringai
 // into browser/renderer bundles. Import via '@everworker/react-ui/plugins' instead.

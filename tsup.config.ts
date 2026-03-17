@@ -14,6 +14,8 @@ export default defineConfig({
     'lucide-react',
     // Optional peer dependencies
     'mermaid', 'react-vega', 'vega-lite', 'markmap-lib', 'markmap-view',
+    // Export service optional deps
+    'html2canvas', 'jspdf', 'docx',
     'react-bootstrap', 'react-bootstrap-icons',
   ],
   // Use esbuild for JSX (not SWC) to avoid @swc/helpers runtime dependency
