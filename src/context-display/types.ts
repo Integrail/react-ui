@@ -38,6 +38,8 @@ export interface IContextDisplayPanelProps {
   pinnedKeys?: string[];
   /** Called when maximize state changes */
   onMaximizedChange?: (isMaximized: boolean) => void;
+  /** Called when user clicks the "Document Mode" button */
+  onEnterDocumentMode?: () => void;
 
   /** Custom filter (overrides default showInUI filter) */
   filterEntries?: (entries: InContextEntry[]) => InContextEntry[];

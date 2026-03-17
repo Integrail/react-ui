@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Database, Minimize2, Upload, Loader2 } from 'lucide-react';
+import { Database, Minimize2, Upload, Loader2, FileText } from 'lucide-react';
 import type { InContextEntry } from '@everworker/oneringai';
 import { ContextEntryCard } from './ContextEntryCard';
 import { useOrderPersistence } from './useOrderPersistence';
@@ -20,6 +20,7 @@ export const ContextDisplayPanel: React.FC<IContextDisplayPanelProps> = ({
   onPinToggle,
   pinnedKeys,
   onMaximizedChange,
+  onEnterDocumentMode,
   filterEntries,
   entriesRef: externalEntriesRef,
 }) => {
@@ -230,6 +231,16 @@ export const ContextDisplayPanel: React.FC<IContextDisplayPanelProps> = ({
           <Database size={14} className="cdp-header__icon" />
           <span className="cdp-header__title">{title}</span>
           <span className="cdp-header__count">{visibleEntries.length}</span>
+
+          {onEnterDocumentMode && (
+            <button
+              className="cdp-action-btn"
+              onClick={onEnterDocumentMode}
+              title="Open document view"
+            >
+              <FileText size={14} />
+            </button>
+          )}
 
           {enableExport && onExport && (
             <div className="cdp-export" ref={dropdownRef}>

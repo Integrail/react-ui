@@ -20,6 +20,9 @@ export * from './chat/index';
 // Context Display components
 export * from './context-display/index';
 
+// Document View components
+export * from './document-view/index';
+
 // Export services (PDF/DOCX)
 export * from './export/index';
 
