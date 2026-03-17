@@ -25,7 +25,7 @@
 .dv-container {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: 1080;
   display: flex;
   flex-direction: column;
   background: var(--dv-bg);
@@ -104,6 +104,16 @@
 .dv-topbar__btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.dv-topbar__btn--close {
+  color: var(--dv-danger);
+  border-color: var(--dv-danger);
+}
+
+.dv-topbar__btn--close:hover {
+  background: rgba(220, 53, 69, 0.08);
+  border-color: var(--dv-danger);
 }
 
 /* --- Export dropdown --- */

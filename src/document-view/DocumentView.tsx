@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Upload, Loader2 } from 'lucide-react';
+import { X, Upload, Loader2 } from 'lucide-react';
 import { DocumentBlock } from './DocumentBlock';
 import { useOrderPersistence } from '../context-display/useOrderPersistence';
 import { formatValueForDisplay } from '../context-display/utils';
@@ -92,11 +92,6 @@ export const DocumentView: React.FC<IDocumentViewProps> = ({
     <div className="dv-container">
       {/* Top bar */}
       <div className="dv-topbar">
-        <button className="dv-topbar__back" onClick={onClose} title="Exit document mode">
-          <ArrowLeft size={18} />
-          <span>Exit Document</span>
-        </button>
-
         <div className="dv-topbar__info">
           <span className="dv-topbar__count">
             {includedCount} of {sortedEntries.length} blocks
@@ -139,6 +134,10 @@ export const DocumentView: React.FC<IDocumentViewProps> = ({
               )}
             </div>
           )}
+          <button className="dv-topbar__btn dv-topbar__btn--close" onClick={onClose} title="Exit document mode">
+            <X size={16} />
+            <span>Exit</span>
+          </button>
         </div>
       </div>
 
