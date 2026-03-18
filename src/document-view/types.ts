@@ -1,5 +1,23 @@
 import type { InContextEntry } from '@everworker/oneringai';
 
+/** Sections to persist when saving a document */
+export interface SaveDocumentInput {
+  title: string;
+  description?: string;
+  sections: Array<{
+    key: string;
+    value: string;
+    description?: string;
+    sortOrder: number;
+  }>;
+}
+
+/** Metadata prefilled by LLM (optional) */
+export interface PrefillMetadata {
+  title: string;
+  description?: string;
+}
+
 export interface IDocumentViewProps {
   /** All context entries (will be filtered/ordered internally) */
   entries: InContextEntry[];
@@ -17,6 +35,14 @@ export interface IDocumentViewProps {
   pinnedKeys?: string[];
   /** If true, hides the Edit and Exit buttons (view-only mode) */
   readOnly?: boolean;
+
+  // ─── Document persistence callbacks ────────────────────────────────────
+  /** Called when user saves the current entries as a persistent document. App provides storage logic. */
+  onSaveDocument?: (input: SaveDocumentInput) => Promise<void>;
+  /** Called when user wants to load a saved document. App returns sections to populate. */
+  onLoadDocument?: () => Promise<Array<{ key: string; value: string; description?: string; sortOrder: number }> | null>;
+  /** Optional LLM-powered prefill for title/description. Called with current sections. */
+  onPrefillMetadata?: (sections: SaveDocumentInput['sections']) => Promise<PrefillMetadata>;
 }
 
 export interface DocumentExportContext {

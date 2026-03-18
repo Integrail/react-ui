@@ -403,6 +403,124 @@
   to { transform: rotate(360deg); }
 }
 
+/* --- Save Modal --- */
+.dv-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dv-modal {
+  background: var(--dv-paper-bg);
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.dv-modal__title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 20px;
+  color: var(--dv-text);
+}
+
+.dv-modal__field {
+  margin-bottom: 16px;
+}
+
+.dv-modal__label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--dv-text-muted);
+  margin-bottom: 6px;
+}
+
+.dv-modal__input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--dv-border);
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--dv-text);
+  background: var(--dv-paper-bg);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+
+.dv-modal__input:focus {
+  border-color: var(--dv-primary);
+  box-shadow: 0 0 0 3px rgba(26, 84, 144, 0.1);
+}
+
+.dv-modal__textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--dv-border);
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--dv-text);
+  background: var(--dv-paper-bg);
+  outline: none;
+  resize: vertical;
+  font-family: var(--dv-font);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+
+.dv-modal__textarea:focus {
+  border-color: var(--dv-primary);
+  box-shadow: 0 0 0 3px rgba(26, 84, 144, 0.1);
+}
+
+.dv-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.dv-modal__btn {
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.dv-modal__btn--cancel {
+  border: 1px solid var(--dv-border);
+  background: var(--dv-paper-bg);
+  color: var(--dv-text);
+}
+
+.dv-modal__btn--cancel:hover {
+  background: var(--dv-border-faint);
+}
+
+.dv-modal__btn--save {
+  border: none;
+  background: var(--dv-primary);
+  color: white;
+}
+
+.dv-modal__btn--save:hover {
+  background: var(--dv-primary-hover);
+}
+
+.dv-modal__btn--save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* --- Responsive --- */
 @media (max-width: 900px) {
   .dv-document {

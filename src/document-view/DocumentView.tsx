@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { X, Upload, Loader2 } from 'lucide-react';
+import { X, Upload, Loader2, Save, FolderOpen } from 'lucide-react';
 import { DocumentBlock } from './DocumentBlock';
 import { useOrderPersistence } from '../context-display/useOrderPersistence';
 import { formatValueForDisplay } from '../context-display/utils';
-import type { IDocumentViewProps, DocumentExportContext } from './types';
+import type { IDocumentViewProps, DocumentExportContext, SaveDocumentInput } from './types';
 
 export const DocumentView: React.FC<IDocumentViewProps> = ({
   entries,
@@ -14,10 +14,19 @@ export const DocumentView: React.FC<IDocumentViewProps> = ({
   filterEntries,
   pinnedKeys,
   readOnly,
+  onSaveDocument,
+  onLoadDocument,
+  onPrefillMetadata,
 }) => {
   const [excludedKeys, setExcludedKeys] = useState<Set<string>>(new Set());
   const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [saveTitle, setSaveTitle] = useState('');
+  const [saveDescription, setSaveDescription] = useState('');
+  const [isPrefilling, setIsPrefilling] = useState(false);
   const documentRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -54,6 +63,67 @@ export const DocumentView: React.FC<IDocumentViewProps> = ({
         .join('\n\n---\n\n'),
     [sortedEntries, excludedKeys],
   );
+
+  // Build sections from current visible, non-excluded entries
+  const buildSections = useCallback((): SaveDocumentInput['sections'] => {
+    return sortedEntries
+      .filter((e) => !excludedKeys.has(e.key))
+      .map((e, idx) => ({
+        key: e.key,
+        value: typeof e.value === 'string' ? e.value : JSON.stringify(e.value),
+        description: e.description,
+        sortOrder: idx,
+      }));
+  }, [sortedEntries, excludedKeys]);
+
+  const handleOpenSaveModal = useCallback(async () => {
+    const sections = buildSections();
+    setShowSaveModal(true);
+    setSaveTitle('');
+    setSaveDescription('');
+
+    if (onPrefillMetadata && sections.length > 0) {
+      setIsPrefilling(true);
+      try {
+        const prefill = await onPrefillMetadata(sections);
+        setSaveTitle(prefill.title);
+        setSaveDescription(prefill.description ?? '');
+      } catch {
+        // Prefill failed — user fills manually
+      } finally {
+        setIsPrefilling(false);
+      }
+    }
+  }, [buildSections, onPrefillMetadata]);
+
+  const handleSaveDocument = useCallback(async () => {
+    if (!onSaveDocument || !saveTitle.trim()) return;
+    setIsSaving(true);
+    try {
+      await onSaveDocument({
+        title: saveTitle.trim(),
+        description: saveDescription.trim() || undefined,
+        sections: buildSections(),
+      });
+      setShowSaveModal(false);
+    } catch (err) {
+      console.error('Document save failed:', err);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [onSaveDocument, saveTitle, saveDescription, buildSections]);
+
+  const handleLoadDocument = useCallback(async () => {
+    if (!onLoadDocument) return;
+    setIsLoading(true);
+    try {
+      await onLoadDocument();
+    } catch (err) {
+      console.error('Document load failed:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [onLoadDocument]);
 
   const handleExport = useCallback(
     async (format: 'pdf' | 'docx') => {
@@ -100,6 +170,28 @@ export const DocumentView: React.FC<IDocumentViewProps> = ({
         </div>
 
         <div className="dv-topbar__actions">
+          {onSaveDocument && !readOnly && (
+            <button
+              className="dv-topbar__btn"
+              onClick={handleOpenSaveModal}
+              disabled={isSaving}
+              title="Save as document"
+            >
+              {isSaving ? <Loader2 size={16} className="dv-spinner" /> : <Save size={16} />}
+              <span>Save</span>
+            </button>
+          )}
+          {onLoadDocument && (
+            <button
+              className="dv-topbar__btn"
+              onClick={handleLoadDocument}
+              disabled={isLoading}
+              title="Load saved document"
+            >
+              {isLoading ? <Loader2 size={16} className="dv-spinner" /> : <FolderOpen size={16} />}
+              <span>Load</span>
+            </button>
+          )}
           {onExport && (
             <div className="dv-export" ref={dropdownRef}>
               <button
@@ -170,6 +262,54 @@ export const DocumentView: React.FC<IDocumentViewProps> = ({
           )}
         </div>
       </div>
+
+      {/* Save Document Modal */}
+      {showSaveModal && (
+        <div className="dv-modal-overlay" onClick={() => !isSaving && setShowSaveModal(false)}>
+          <div className="dv-modal" onClick={(e) => e.stopPropagation()}>
+            <h3 className="dv-modal__title">Save Document</h3>
+            <div className="dv-modal__field">
+              <label className="dv-modal__label">Title *</label>
+              <input
+                className="dv-modal__input"
+                type="text"
+                value={saveTitle}
+                onChange={(e) => setSaveTitle(e.target.value)}
+                placeholder={isPrefilling ? 'Generating title...' : 'Document title'}
+                disabled={isPrefilling}
+                autoFocus
+              />
+            </div>
+            <div className="dv-modal__field">
+              <label className="dv-modal__label">Description</label>
+              <textarea
+                className="dv-modal__textarea"
+                value={saveDescription}
+                onChange={(e) => setSaveDescription(e.target.value)}
+                placeholder={isPrefilling ? 'Generating description...' : 'Optional description'}
+                disabled={isPrefilling}
+                rows={3}
+              />
+            </div>
+            <div className="dv-modal__actions">
+              <button
+                className="dv-modal__btn dv-modal__btn--cancel"
+                onClick={() => setShowSaveModal(false)}
+                disabled={isSaving}
+              >
+                Cancel
+              </button>
+              <button
+                className="dv-modal__btn dv-modal__btn--save"
+                onClick={handleSaveDocument}
+                disabled={isSaving || !saveTitle.trim() || isPrefilling}
+              >
+                {isSaving ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
