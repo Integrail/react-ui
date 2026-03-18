@@ -11,6 +11,7 @@ export const DocumentBlock: React.FC<IDocumentBlockProps> = ({
   isExcluded,
   onToggleExclude,
   onSaveEntry,
+  readOnly,
 }) => {
   const displayValue = useMemo(() => formatValueForDisplay(entry.value), [entry.value]);
   const [isEditing, setIsEditing] = useState(false);
@@ -75,7 +76,7 @@ export const DocumentBlock: React.FC<IDocumentBlockProps> = ({
               <X size={14} />
             </button>
           )}
-          {!isEditing && onSaveEntry && (
+          {!isEditing && onSaveEntry && !readOnly && (
             <button
               className="dv-block__btn"
               onClick={() => setIsEditing(true)}

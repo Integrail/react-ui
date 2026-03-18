@@ -15,6 +15,8 @@ export interface IDocumentViewProps {
   filterEntries?: (entries: InContextEntry[]) => InContextEntry[];
   /** Currently pinned entry keys */
   pinnedKeys?: string[];
+  /** If true, hides the Edit and Exit buttons (view-only mode) */
+  readOnly?: boolean;
 }
 
 export interface DocumentExportContext {
@@ -32,4 +34,6 @@ export interface IDocumentBlockProps {
   onToggleExclude: (key: string) => void;
   /** Called when user saves edited content */
   onSaveEntry?: (key: string, newValue: string) => Promise<void>;
+  /** If true, hides the Edit button (view-only mode) */
+  readOnly?: boolean;
 }

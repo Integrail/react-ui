@@ -13,6 +13,7 @@ export const DocumentView: React.FC<IDocumentViewProps> = ({
   storageKey = 'rui-context-order',
   filterEntries,
   pinnedKeys,
+  readOnly,
 }) => {
   const [excludedKeys, setExcludedKeys] = useState<Set<string>>(new Set());
   const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
@@ -134,10 +135,12 @@ export const DocumentView: React.FC<IDocumentViewProps> = ({
               )}
             </div>
           )}
-          <button className="dv-topbar__btn dv-topbar__btn--close" onClick={onClose} title="Exit document mode">
-            <X size={16} />
-            <span>Exit</span>
-          </button>
+          {!readOnly && (
+            <button className="dv-topbar__btn dv-topbar__btn--close" onClick={onClose} title="Exit document mode">
+              <X size={16} />
+              <span>Exit</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -151,6 +154,7 @@ export const DocumentView: React.FC<IDocumentViewProps> = ({
                 isExcluded={excludedKeys.has(entry.key)}
                 onToggleExclude={handleToggleExclude}
                 onSaveEntry={onSaveEntry}
+                readOnly={readOnly}
               />
               {/* Faint separator between blocks (not after last) */}
               {index < sortedEntries.length - 1 && (
