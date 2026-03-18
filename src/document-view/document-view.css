@@ -44,6 +44,8 @@
   background: var(--dv-paper-bg);
   border-bottom: 1px solid var(--dv-border);
   gap: 16px;
+  /* Override Electron drag region so buttons are clickable */
+  -webkit-app-region: no-drag;
 }
 
 .dv-topbar__back {
