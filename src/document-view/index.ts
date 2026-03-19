@@ -6,4 +6,5 @@ export type {
   DocumentExportContext,
   SaveDocumentInput,
   PrefillMetadata,
+  DocumentVisibility,
 } from './types';

@@ -3,7 +3,7 @@ import { X, Upload, Loader2, Save, FolderOpen } from 'lucide-react';
 import { DocumentBlock } from './DocumentBlock';
 import { useOrderPersistence } from '../context-display/useOrderPersistence';
 import { formatValueForDisplay } from '../context-display/utils';
-import type { IDocumentViewProps, DocumentExportContext, SaveDocumentInput } from './types';
+import type { IDocumentViewProps, DocumentExportContext, SaveDocumentInput, DocumentVisibility } from './types';
 
 export const DocumentView: React.FC<IDocumentViewProps> = ({
   entries,
@@ -26,6 +26,7 @@ export const DocumentView: React.FC<IDocumentViewProps> = ({
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [saveTitle, setSaveTitle] = useState('');
   const [saveDescription, setSaveDescription] = useState('');
+  const [saveVisibility, setSaveVisibility] = useState<DocumentVisibility>('private');
   const [isPrefilling, setIsPrefilling] = useState(false);
   const documentRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -81,6 +82,7 @@ export const DocumentView: React.FC<IDocumentViewProps> = ({
     setShowSaveModal(true);
     setSaveTitle('');
     setSaveDescription('');
+    setSaveVisibility('private');
 
     if (onPrefillMetadata && sections.length > 0) {
       setIsPrefilling(true);
@@ -103,6 +105,7 @@ export const DocumentView: React.FC<IDocumentViewProps> = ({
       await onSaveDocument({
         title: saveTitle.trim(),
         description: saveDescription.trim() || undefined,
+        visibility: saveVisibility,
         sections: buildSections(),
       });
       setShowSaveModal(false);
@@ -290,6 +293,35 @@ export const DocumentView: React.FC<IDocumentViewProps> = ({
                 disabled={isPrefilling}
                 rows={3}
               />
+            </div>
+            <div className="dv-modal__field">
+              <label className="dv-modal__label">Visibility</label>
+              <div className="dv-visibility">
+                {([
+                  ['private', 'Only me', 'Only you can view and edit this document'],
+                  ['group', 'My team', 'Anyone in your group can view this document'],
+                  ['installation', 'All users', 'All authenticated users in this installation'],
+                  ['public', 'Public', 'Anyone on the web, no login required'],
+                ] as const).map(([value, label, hint]) => (
+                  <label
+                    key={value}
+                    className={`dv-visibility__option${saveVisibility === value ? ' dv-visibility__option--selected' : ''}`}
+                  >
+                    <input
+                      type="radio"
+                      name="visibility"
+                      value={value}
+                      checked={saveVisibility === value}
+                      onChange={() => setSaveVisibility(value)}
+                      className="dv-visibility__radio"
+                    />
+                    <div className="dv-visibility__content">
+                      <span className="dv-visibility__label">{label}</span>
+                      <span className="dv-visibility__hint">{hint}</span>
+                    </div>
+                  </label>
+                ))}
+              </div>
             </div>
             <div className="dv-modal__actions">
               <button

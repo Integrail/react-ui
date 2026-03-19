@@ -1,9 +1,20 @@
 import type { InContextEntry } from '@everworker/oneringai';
 
+/**
+ * Document visibility level — maps to NimbleAudit Entity/IResource permission fields.
+ *
+ * - 'private':      only the owner (ownerId) can access
+ * - 'group':        owner's group can read (groupId set)
+ * - 'installation': all authenticated users can read (permissions.read.all = true)
+ * - 'public':       anyone, including unauthenticated users (isPublic = true)
+ */
+export type DocumentVisibility = 'private' | 'group' | 'installation' | 'public';
+
 /** Sections to persist when saving a document */
 export interface SaveDocumentInput {
   title: string;
   description?: string;
+  visibility: DocumentVisibility;
   sections: Array<{
     key: string;
     value: string;
