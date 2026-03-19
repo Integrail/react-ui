@@ -29,6 +29,17 @@ export interface PrefillMetadata {
   description?: string;
 }
 
+/** Summary of a saved document (for the load picker) */
+export interface DocumentSummary {
+  _id: string;
+  title: string;
+  description?: string;
+  slug: string;
+  updatedAt: number | string | Date;
+  tags?: string[];
+  sectionCount: number;
+}
+
 export interface IDocumentViewProps {
   /** All context entries (will be filtered/ordered internally) */
   entries: InContextEntry[];
@@ -48,12 +59,16 @@ export interface IDocumentViewProps {
   readOnly?: boolean;
 
   // ─── Document persistence callbacks ────────────────────────────────────
-  /** Called when user saves the current entries as a persistent document. App provides storage logic. */
-  onSaveDocument?: (input: SaveDocumentInput) => Promise<void>;
-  /** Called when user wants to load a saved document. App returns sections to populate. */
-  onLoadDocument?: () => Promise<Array<{ key: string; value: string; description?: string; sortOrder: number }> | null>;
+  /** Called when user saves the current entries as a persistent document. App provides storage logic. Returns the saved doc summary (for success feedback). */
+  onSaveDocument?: (input: SaveDocumentInput) => Promise<{ slug: string } | void>;
+  /** Called to list available documents for the load picker. App provides storage logic. */
+  onListDocuments?: () => Promise<DocumentSummary[]>;
+  /** Called when user selects a document to load. App loads sections into context. */
+  onLoadDocument?: (docId: string) => Promise<void>;
   /** Optional LLM-powered prefill for title/description. Called with current sections. */
   onPrefillMetadata?: (sections: SaveDocumentInput['sections']) => Promise<PrefillMetadata>;
+  /** Base URL for shared document links (e.g. "https://app.everworker.ai/shared/docs"). If provided, shows link after save. */
+  sharedDocsBaseUrl?: string;
 }
 
 export interface DocumentExportContext {

@@ -3,7 +3,7 @@ import { X, Upload, Loader2, Save, FolderOpen } from 'lucide-react';
 import { DocumentBlock } from './DocumentBlock';
 import { useOrderPersistence } from '../context-display/useOrderPersistence';
 import { formatValueForDisplay } from '../context-display/utils';
-import type { IDocumentViewProps, DocumentExportContext, SaveDocumentInput, DocumentVisibility } from './types';
+import type { IDocumentViewProps, DocumentExportContext, SaveDocumentInput, DocumentVisibility, DocumentSummary } from './types';
 
 export const DocumentView: React.FC<IDocumentViewProps> = ({
   entries,
@@ -15,8 +15,10 @@ export const DocumentView: React.FC<IDocumentViewProps> = ({
   pinnedKeys,
   readOnly,
   onSaveDocument,
+  onListDocuments,
   onLoadDocument,
   onPrefillMetadata,
+  sharedDocsBaseUrl,
 }) => {
   const [excludedKeys, setExcludedKeys] = useState<Set<string>>(new Set());
   const [exportDropdownOpen, setExportDropdownOpen] = useState(false);
@@ -28,6 +30,11 @@ export const DocumentView: React.FC<IDocumentViewProps> = ({
   const [saveDescription, setSaveDescription] = useState('');
   const [saveVisibility, setSaveVisibility] = useState<DocumentVisibility>('private');
   const [isPrefilling, setIsPrefilling] = useState(false);
+  const [showLoadModal, setShowLoadModal] = useState(false);
+  const [loadDocs, setLoadDocs] = useState<DocumentSummary[]>([]);
+  const [isLoadingList, setIsLoadingList] = useState(false);
+  const [isLoadingDoc, setIsLoadingDoc] = useState<string | null>(null);
+  const [saveSuccess, setSaveSuccess] = useState<{ slug: string } | null>(null);
   const documentRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -102,29 +109,49 @@ export const DocumentView: React.FC<IDocumentViewProps> = ({
     if (!onSaveDocument || !saveTitle.trim()) return;
     setIsSaving(true);
     try {
-      await onSaveDocument({
+      const result = await onSaveDocument({
         title: saveTitle.trim(),
         description: saveDescription.trim() || undefined,
         visibility: saveVisibility,
         sections: buildSections(),
       });
       setShowSaveModal(false);
+      if (result?.slug) {
+        setSaveSuccess({ slug: result.slug });
+        setTimeout(() => setSaveSuccess(null), 8000);
+      }
     } catch (err) {
       console.error('Document save failed:', err);
     } finally {
       setIsSaving(false);
     }
-  }, [onSaveDocument, saveTitle, saveDescription, buildSections]);
+  }, [onSaveDocument, saveTitle, saveDescription, saveVisibility, buildSections]);
 
-  const handleLoadDocument = useCallback(async () => {
-    if (!onLoadDocument) return;
-    setIsLoading(true);
+  const handleOpenLoadModal = useCallback(async () => {
+    if (!onListDocuments) return;
+    setShowLoadModal(true);
+    setIsLoadingList(true);
     try {
-      await onLoadDocument();
+      const docs = await onListDocuments();
+      setLoadDocs(docs);
     } catch (err) {
-      console.error('Document load failed:', err);
+      console.error('Failed to list documents:', err);
+      setLoadDocs([]);
     } finally {
-      setIsLoading(false);
+      setIsLoadingList(false);
+    }
+  }, [onListDocuments]);
+
+  const handleSelectDocument = useCallback(async (docId: string) => {
+    if (!onLoadDocument) return;
+    setIsLoadingDoc(docId);
+    try {
+      await onLoadDocument(docId);
+      setShowLoadModal(false);
+    } catch (err) {
+      console.error('Failed to load document:', err);
+    } finally {
+      setIsLoadingDoc(null);
     }
   }, [onLoadDocument]);
 
@@ -184,14 +211,13 @@ export const DocumentView: React.FC<IDocumentViewProps> = ({
               <span>Save</span>
             </button>
           )}
-          {onLoadDocument && (
+          {onListDocuments && onLoadDocument && (
             <button
               className="dv-topbar__btn"
-              onClick={handleLoadDocument}
-              disabled={isLoading}
+              onClick={handleOpenLoadModal}
               title="Load saved document"
             >
-              {isLoading ? <Loader2 size={16} className="dv-spinner" /> : <FolderOpen size={16} />}
+              <FolderOpen size={16} />
               <span>Load</span>
             </button>
           )}
@@ -265,6 +291,75 @@ export const DocumentView: React.FC<IDocumentViewProps> = ({
           )}
         </div>
       </div>
+
+      {/* Save success toast */}
+      {saveSuccess && (
+        <div className="dv-toast">
+          <span>Document saved!</span>
+          {sharedDocsBaseUrl && (
+            <a
+              className="dv-toast__link"
+              href={`${sharedDocsBaseUrl}/${saveSuccess.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Open link
+            </a>
+          )}
+          <button className="dv-toast__close" onClick={() => setSaveSuccess(null)}>&times;</button>
+        </div>
+      )}
+
+      {/* Load Document Picker Modal */}
+      {showLoadModal && (
+        <div className="dv-modal-overlay" onClick={() => !isLoadingDoc && setShowLoadModal(false)}>
+          <div className="dv-modal dv-modal--wide" onClick={(e) => e.stopPropagation()}>
+            <h3 className="dv-modal__title">Load Document</h3>
+            {isLoadingList ? (
+              <div className="dv-load-list__loading">
+                <Loader2 size={20} className="dv-spinner" />
+                <span>Loading documents...</span>
+              </div>
+            ) : loadDocs.length === 0 ? (
+              <div className="dv-load-list__empty">No saved documents found.</div>
+            ) : (
+              <div className="dv-load-list">
+                {loadDocs.map((doc) => (
+                  <button
+                    key={doc._id}
+                    className="dv-load-list__item"
+                    onClick={() => handleSelectDocument(doc._id)}
+                    disabled={!!isLoadingDoc}
+                  >
+                    <div className="dv-load-list__info">
+                      <span className="dv-load-list__title">{doc.title}</span>
+                      {doc.description && (
+                        <span className="dv-load-list__desc">{doc.description}</span>
+                      )}
+                      <span className="dv-load-list__meta">
+                        {doc.sectionCount} section{doc.sectionCount !== 1 ? 's' : ''}
+                        {' · '}
+                        {new Date(doc.updatedAt).toLocaleDateString()}
+                        {doc.tags?.length ? ` · ${doc.tags.join(', ')}` : ''}
+                      </span>
+                    </div>
+                    {isLoadingDoc === doc._id && <Loader2 size={16} className="dv-spinner" />}
+                  </button>
+                ))}
+              </div>
+            )}
+            <div className="dv-modal__actions">
+              <button
+                className="dv-modal__btn dv-modal__btn--cancel"
+                onClick={() => setShowLoadModal(false)}
+                disabled={!!isLoadingDoc}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Save Document Modal */}
       {showSaveModal && (

@@ -7,4 +7,5 @@ export type {
   SaveDocumentInput,
   PrefillMetadata,
   DocumentVisibility,
+  DocumentSummary,
 } from './types';
