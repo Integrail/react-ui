@@ -23,6 +23,7 @@ export const ContextDisplayPanel: React.FC<IContextDisplayPanelProps> = ({
   onEnterDocumentMode,
   filterEntries,
   entriesRef: externalEntriesRef,
+  onInteractiveAction,
 }) => {
   const [collapsedKeys, setCollapsedKeys] = useState<Set<string>>(new Set());
   const [maximizedKey, setMaximizedKey] = useState<string | null>(null);
@@ -328,6 +329,7 @@ export const ContextDisplayPanel: React.FC<IContextDisplayPanelProps> = ({
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onDragEnd={handleDragEnd}
+            onInteractiveAction={onInteractiveAction}
           />
         ))}
       </div>

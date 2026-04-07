@@ -35,6 +35,7 @@ export default defineConfig({
       { src: 'src/chat/thinking.css', dest: 'dist/thinking.css' },
       { src: 'src/context-display/context-display.css', dest: 'dist/context-display.css' },
       { src: 'src/document-view/document-view.css', dest: 'dist/document-view.css' },
+      { src: 'src/interactive-ui/interactive-ui.css', dest: 'dist/interactive-ui.css' },
     ];
 
     for (const { src, dest } of cssFiles) {

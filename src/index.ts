@@ -20,6 +20,9 @@ export * from './chat/index';
 // Context Display components
 export * from './context-display/index';
 
+// Interactive UI components
+export * from './interactive-ui/index';
+
 // Document View components
 export * from './document-view/index';
 

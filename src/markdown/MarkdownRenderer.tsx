@@ -21,10 +21,14 @@ import { CodeBlock } from './CodeBlock';
 
 // ---------------------------------------------------------------------------
 // Streaming context — allows nested CodeBlock to know if content is streaming
+// and provides onInteractiveAction to InteractiveUIBlock
 // ---------------------------------------------------------------------------
+
+import type { OnInteractiveAction } from '../interactive-ui/types';
 
 interface MarkdownContextValue {
   isStreaming: boolean;
+  onInteractiveAction?: OnInteractiveAction;
 }
 
 const MarkdownContext = createContext<MarkdownContextValue>({ isStreaming: false });
@@ -282,9 +286,9 @@ function hasExtension(url: string, extensions: string[]): boolean {
   return extensions.some((ext) => lower.endsWith(ext));
 }
 
-/** Code component that reads streaming state from context */
+/** Code component that reads streaming state and interactive action handler from context */
 function CodeComponent({ className, children }: { className?: string; children?: React.ReactNode }) {
-  const { isStreaming } = useMarkdownContext();
+  const { isStreaming, onInteractiveAction } = useMarkdownContext();
   const match = /language-(\w+)/.exec(className || '');
   const language = match ? match[1] : '';
   const code = String(children).replace(/\n$/, '');
@@ -293,7 +297,7 @@ function CodeComponent({ className, children }: { className?: string; children?:
   if (isInline) {
     return <code className="inline-code">{children}</code>;
   }
-  return <CodeBlock language={language} code={code} isStreaming={isStreaming} />;
+  return <CodeBlock language={language} code={code} isStreaming={isStreaming} onInteractiveAction={onInteractiveAction} />;
 }
 
 const markdownComponents: Components = {
@@ -369,6 +373,7 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
   children,
   className = '',
   isStreaming = false,
+  onInteractiveAction,
 }: MarkdownRendererProps): React.ReactElement {
   const rawContent = content ?? children ?? '';
 
@@ -381,7 +386,7 @@ export const MarkdownRenderer = memo(function MarkdownRenderer({
     }
   }, [rawContent]);
 
-  const contextValue = useMemo(() => ({ isStreaming }), [isStreaming]);
+  const contextValue = useMemo(() => ({ isStreaming, onInteractiveAction }), [isStreaming, onInteractiveAction]);
 
   return (
     <MarkdownContext.Provider value={contextValue}>

@@ -21,3 +21,6 @@ export type {
   MarkmapRendererProps,
   RenderErrorBoundaryProps,
 } from './types';
+
+// Re-export interactive UI action type for convenience
+export type { OnInteractiveAction, InteractiveUIAction } from '../interactive-ui/types';

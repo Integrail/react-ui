@@ -1,4 +1,5 @@
 import type { InContextEntry } from '@everworker/oneringai';
+import type { OnInteractiveAction } from '../interactive-ui/types';
 
 export type ExportFormat = 'pdf' | 'docx';
 
@@ -46,4 +47,7 @@ export interface IContextDisplayPanelProps {
 
   /** Ref to the entries container DOM element (for export capture) */
   entriesRef?: React.RefObject<HTMLDivElement>;
+
+  /** Callback when user interacts with an interactive UI block */
+  onInteractiveAction?: OnInteractiveAction;
 }

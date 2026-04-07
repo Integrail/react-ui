@@ -2,6 +2,8 @@
  * Shared types for the markdown rendering components.
  */
 
+import type { OnInteractiveAction } from '../interactive-ui/types';
+
 export interface MarkdownRendererProps {
   /** The markdown content string to render */
   content?: string;
@@ -11,6 +13,8 @@ export interface MarkdownRendererProps {
   className?: string;
   /** Whether the content is currently being streamed (delays special block rendering) */
   isStreaming?: boolean;
+  /** Callback when user interacts with a ```ui interactive block */
+  onInteractiveAction?: OnInteractiveAction;
 }
 
 export interface CodeBlockProps {
@@ -20,6 +24,8 @@ export interface CodeBlockProps {
   code: string;
   /** Whether the parent markdown is streaming */
   isStreaming?: boolean;
+  /** Callback for interactive UI actions (passed from MarkdownContext) */
+  onInteractiveAction?: OnInteractiveAction;
 }
 
 export interface MermaidDiagramProps {

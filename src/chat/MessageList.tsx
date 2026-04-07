@@ -20,6 +20,7 @@ import { StreamingText } from './StreamingText';
 import { ThinkingBlock } from './ThinkingBlock';
 import { ToolCallCard } from './ToolCallCard';
 import type { IChatMessage, IMessageListProps } from './types';
+import type { OnInteractiveAction } from '../interactive-ui/types';
 
 /**
  * Individual message component with hover controls
@@ -28,7 +29,8 @@ const MessageWithControls: React.FC<{
   message: IChatMessage;
   index: number;
   onCopyMessage?: (content: string) => void;
-}> = memo(({ message, index, onCopyMessage }) => {
+  onInteractiveAction?: OnInteractiveAction;
+}> = memo(({ message, index, onCopyMessage, onInteractiveAction }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -113,7 +115,7 @@ const MessageWithControls: React.FC<{
             rendererType="markdown message"
             fallbackMessage="Error rendering message content"
           >
-            <MarkdownRenderer content={message.content} isStreaming={message.isStreaming} />
+            <MarkdownRenderer content={message.content} isStreaming={message.isStreaming} onInteractiveAction={onInteractiveAction} />
           </RenderErrorBoundary>
         </div>
       )}
@@ -157,6 +159,7 @@ export const MessageList: React.FC<IMessageListProps> = memo(
     className = '',
     renderMessage,
     onCopyMessage,
+    onInteractiveAction,
   }) => {
     const endRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -185,6 +188,7 @@ export const MessageList: React.FC<IMessageListProps> = memo(
                 message={message}
                 index={index}
                 onCopyMessage={onCopyMessage}
+                onInteractiveAction={onInteractiveAction}
               />
             ),
         )}

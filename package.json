@@ -23,6 +23,7 @@
     "./styles/thinking": "./dist/thinking.css",
     "./styles/context-display": "./dist/context-display.css",
     "./styles/document-view": "./dist/document-view.css",
+    "./styles/interactive-ui": "./dist/interactive-ui.css",
     "./plugins": {
       "import": {
         "types": "./dist/plugins.d.ts",

@@ -19,6 +19,7 @@ import type { CodeBlockProps } from './types';
 const MermaidDiagram = lazy(() => import('./MermaidDiagram'));
 const VegaChart = lazy(() => import('./VegaChart'));
 const MarkmapRenderer = lazy(() => import('./MarkmapRenderer'));
+const InteractiveUIBlock = lazy(() => import('../interactive-ui/InteractiveUIBlock'));
 
 // Loading fallback for lazy-loaded components
 const LoadingFallback = () => (
@@ -54,11 +55,11 @@ const ErrorFallback = ({ error, code }: { error: string; code: string }) => (
 );
 
 const isSpecialBlock = (lang: string): boolean => {
-  const specialLangs = ['mermaid', 'vega', 'vega-lite', 'markmap', 'mindmap'];
+  const specialLangs = ['mermaid', 'vega', 'vega-lite', 'markmap', 'mindmap', 'ui'];
   return specialLangs.includes(lang.toLowerCase());
 };
 
-export function CodeBlock({ language, code, isStreaming = false }: CodeBlockProps): React.ReactElement {
+export function CodeBlock({ language, code, isStreaming = false, onInteractiveAction }: CodeBlockProps): React.ReactElement {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [shouldRender, setShouldRender] = useState(!isStreaming);
@@ -151,6 +152,26 @@ export function CodeBlock({ language, code, isStreaming = false }: CodeBlockProp
         ) : (
           <Suspense fallback={<LoadingFallback />}>
             <MarkmapRenderer code={code} onError={handleError} />
+          </Suspense>
+        )}
+      </div>
+    );
+  }
+
+  if (normalizedLang === 'ui') {
+    return (
+      <div className="code-block code-block--ui">
+        {isStreaming || !shouldRender ? (
+          <StreamingPreview language="interactive form" code={code} />
+        ) : error ? (
+          <ErrorFallback error={error} code={code} />
+        ) : (
+          <Suspense fallback={<LoadingFallback />}>
+            <InteractiveUIBlock
+              code={code}
+              onAction={onInteractiveAction}
+              onError={handleError}
+            />
           </Suspense>
         )}
       </div>

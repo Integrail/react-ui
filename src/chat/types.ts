@@ -181,4 +181,6 @@ export interface IMessageListProps {
   renderMessage?: (message: IChatMessage, index: number) => React.ReactNode;
   onCopyMessage?: (content: string) => void;
   onExport?: (message: IChatMessage, element: HTMLElement) => void;
+  /** Callback when user interacts with an interactive UI block in a message */
+  onInteractiveAction?: import('../interactive-ui/types').OnInteractiveAction;
 }

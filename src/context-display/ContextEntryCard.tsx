@@ -14,6 +14,7 @@ import {
 import { MarkdownRenderer } from '../markdown/MarkdownRenderer';
 import { formatValueForDisplay, PRIORITY_CLASSES } from './utils';
 import type { InContextEntry } from '@everworker/oneringai';
+import type { OnInteractiveAction } from '../interactive-ui/types';
 
 const MIN_TEXTAREA_ROWS = 6;
 
@@ -45,6 +46,9 @@ interface IContextEntryCardProps {
   // Actions
   onCollapseToggle: (key: string) => void;
   onMaximizeToggle: (key: string) => void;
+
+  // Interactive UI
+  onInteractiveAction?: OnInteractiveAction;
 }
 
 export const ContextEntryCard: React.FC<IContextEntryCardProps> = ({
@@ -67,6 +71,7 @@ export const ContextEntryCard: React.FC<IContextEntryCardProps> = ({
   onPinToggle,
   onCollapseToggle,
   onMaximizeToggle,
+  onInteractiveAction,
 }) => {
   const displayValue = useMemo(() => formatValueForDisplay(entry.value), [entry.value]);
   const [isEditing, setIsEditing] = useState(false);
@@ -233,7 +238,7 @@ export const ContextEntryCard: React.FC<IContextEntryCardProps> = ({
             />
           ) : (
             <div className="cdp-card__markdown">
-              <MarkdownRenderer content={displayValue} />
+              <MarkdownRenderer content={displayValue} onInteractiveAction={onInteractiveAction} />
             </div>
           )}
         </div>
