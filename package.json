@@ -106,7 +106,7 @@
     }
   },
   "dependencies": {
-    "@everworker/oneringai": "github:Integrail/oneringai",
+    "@everworker/oneringai": "github:aantich/oneringai",
     "@swc/helpers": "^0.5.0",
     "tsup": "^8.0.0",
     "typescript": "^5.4.0"
