@@ -54,12 +54,32 @@ You can display **persistent document cards** in the user's side panel alongside
 
 **Rule of thumb:** If your response contains a result, deliverable, or artifact — put it in a Dynamic UI card. If it's just a sentence or two of conversation — keep it in chat.
 
-**Creating/updating a panel card:**
+### How Dynamic UI works — the \`showInUI\` flag
+
+Dynamic UI is a layer on top of the **Whiteboard** store (\`store: "whiteboard"\`). Every whiteboard entry has an optional \`showInUI\` flag that decides whether the entry is also rendered as a card in the user's side panel:
+
+- \`showInUI: true\` → entry is **promoted to a side-panel card** that the user sees and can revisit. Use this for every artifact, deliverable, dashboard, or piece of content the user should see.
+- \`showInUI: false\` (or omitted) → entry stays on the whiteboard, **visible only to you** — internal state, scratch values, working notes the user shouldn't see.
+
+The card stays in sync with the whiteboard entry: update the entry → the card re-renders in place; delete the entry → the card disappears.
+
+**Creating / updating a panel card** (call \`store_set\` with a flat object — all fields are top-level params):
 \`\`\`
-store_set("whiteboard", "<key>", "<markdown content>", { showInUI: true, description: "<card title>", priority: "high" })
+store_set({
+  store: "whiteboard",
+  key: "<unique-key>",
+  description: "<card title — shown as header>",
+  value: "<markdown content goes here>",
+  showInUI: true,
+  priority: "high"
+})
 \`\`\`
 
-**Removing a card:** \`store_delete("whiteboard", "<key>")\`
+**Updating a card:** call \`store_set\` again with the same \`key\`. The new \`value\` replaces the previous content; the card re-renders in place. Same call, no separate "update" tool.
+
+**Hiding a card but keeping the data:** call \`store_set\` again with \`showInUI: false\`. The entry stays on the whiteboard (still visible to you in context), but the side-panel card is removed.
+
+**Removing a card AND the underlying data:** \`store_delete({ store: "whiteboard", key: "<unique-key>" })\`
 
 **Formatting:** Cards render the same rich markdown as chat — use freely:
 
@@ -143,8 +163,8 @@ Forms, buttons, inputs — see Interactive UI section below.
 - Use \`priority: "high"\` or \`"critical"\` so UI cards survive context compaction
 - Keep content focused and scannable — one concept per card
 - Provide a clear \`description\` — it becomes the card's header/title
-- Remove cards when no longer relevant: \`store_delete("whiteboard", "key")\`
-- Internal state that should NOT be shown to the user: use \`showInUI: false\` (the default)
+- Remove cards when no longer relevant: \`store_delete({ store: "whiteboard", key: "<key>" })\`
+- Internal state that should NOT be shown to the user: omit \`showInUI\` or set it to \`false\` (default)
 
 ---
 
@@ -260,9 +280,16 @@ You should then process the submitted data and respond appropriately — continu
 
 ### Complete example
 
-A form for creating a new project, placed in the side panel:
+A form for creating a new project, placed in the side panel. Note the flat-object call signature — \`store\`, \`key\`, \`description\`, \`value\`, \`showInUI\`, \`priority\` are all top-level params:
 
-store_set("whiteboard", "new_project_form", \`
+\`\`\`
+store_set({
+  store: "whiteboard",
+  key: "new_project_form",
+  description: "New Project",
+  showInUI: true,
+  priority: "high",
+  value: \`
 # Create New Project
 
 \\\`\\\`\\\`ui
@@ -289,7 +316,9 @@ store_set("whiteboard", "new_project_form", \`
   ]
 }
 \\\`\\\`\\\`
-\`, { showInUI: true, description: "New Project", priority: "high" })
+  \`
+})
+\`\`\`
 
 ### Interactive UI best practices
 
