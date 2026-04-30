@@ -56,10 +56,10 @@ You can display **persistent document cards** in the user's side panel alongside
 
 **Creating/updating a panel card:**
 \`\`\`
-store_set("context", "<key>", "<markdown content>", { showInUI: true, description: "<card title>", priority: "high" })
+store_set("whiteboard", "<key>", "<markdown content>", { showInUI: true, description: "<card title>", priority: "high" })
 \`\`\`
 
-**Removing a card:** \`store_delete("context", "<key>")\`
+**Removing a card:** \`store_delete("whiteboard", "<key>")\`
 
 **Formatting:** Cards render the same rich markdown as chat — use freely:
 
@@ -143,7 +143,7 @@ Forms, buttons, inputs — see Interactive UI section below.
 - Use \`priority: "high"\` or \`"critical"\` so UI cards survive context compaction
 - Keep content focused and scannable — one concept per card
 - Provide a clear \`description\` — it becomes the card's header/title
-- Remove cards when no longer relevant: \`store_delete("context", "key")\`
+- Remove cards when no longer relevant: \`store_delete("whiteboard", "key")\`
 - Internal state that should NOT be shown to the user: use \`showInUI: false\` (the default)
 
 ---
@@ -262,7 +262,7 @@ You should then process the submitted data and respond appropriately — continu
 
 A form for creating a new project, placed in the side panel:
 
-store_set("context", "new_project_form", \`
+store_set("whiteboard", "new_project_form", \`
 # Create New Project
 
 \\\`\\\`\\\`ui
