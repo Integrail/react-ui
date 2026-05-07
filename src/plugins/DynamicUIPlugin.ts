@@ -7,12 +7,15 @@
  * This plugin has NO tools, NO content, NO state — it only injects instructions
  * into the system prompt. Requires InContextMemory to be enabled.
  *
+ * The Interactive UI section (```ui forms/buttons) is **opt-in** and disabled
+ * by default — pass `{ interactiveUI: true }` in the plugin config to enable.
+ *
  * Lives in @everworker/react-ui because it's only useful for UI-enabled agents.
  * Apps register it manually:
  *
  * ```typescript
  * import { DynamicUIPlugin } from '@everworker/react-ui/plugins';
- * ctx.registerPlugin(new DynamicUIPlugin());
+ * ctx.registerPlugin(new DynamicUIPlugin({ interactiveUI: true }));
  * ```
  */
 
@@ -26,7 +29,7 @@ const estimateTokens = (text: string): number => Math.ceil(text.length / 3.5);
 // Instructions
 // ============================================================================
 
-const DYNAMIC_UI_INSTRUCTIONS = `## Dynamic UI — Side Panel
+const SIDE_PANEL_INSTRUCTIONS = `## Dynamic UI — Side Panel
 
 You can display **persistent document cards** in the user's side panel alongside the chat. These cards are **session-persistent** — they remain visible and accessible as the conversation continues, and the user can revisit, consult, and reference them at any time.
 
@@ -146,9 +149,6 @@ Create interactive mindmaps from markdown hierarchies:
 ## Branch 3
 \`\`\`
 
-### Interactive UI
-Forms, buttons, inputs — see Interactive UI section below.
-
 ### Formatting Best Practices
 1. Use diagrams and charts when explaining complex concepts, processes, or data
 2. Use tables for comparing options or presenting structured data
@@ -164,7 +164,17 @@ Forms, buttons, inputs — see Interactive UI section below.
 - Keep content focused and scannable — one concept per card
 - Provide a clear \`description\` — it becomes the card's header/title
 - Remove cards when no longer relevant: \`store_delete({ store: "whiteboard", key: "<key>" })\`
-- Internal state that should NOT be shown to the user: omit \`showInUI\` or set it to \`false\` (default)
+- Internal state that should NOT be shown to the user: omit \`showInUI\` or set it to \`false\` (default)`;
+
+// ============================================================================
+// Interactive UI Instructions (opt-in via plugin config: { interactiveUI: true })
+// ============================================================================
+//
+// Disabled by default — only injected when the agent's plugin config explicitly
+// enables it. Keeps prompt tokens down for agents that don't need form support
+// and avoids tempting the LLM to emit \`\`\`ui blocks the host UI may not render.
+
+const INTERACTIVE_UI_INSTRUCTIONS = `
 
 ---
 
@@ -335,24 +345,44 @@ store_set({
 // Plugin Implementation
 // ============================================================================
 
+/**
+ * Config accepted by DynamicUIPlugin.
+ *
+ * @property interactiveUI - When `true`, appends the Interactive UI (forms,
+ *   buttons, \`\`\`ui blocks) instruction section to the system prompt. Defaults
+ *   to `false` — agents only get the Side Panel (showInUI) instructions unless
+ *   the host explicitly opts in. Forms add ~190 tokens of prompt overhead and
+ *   require the host UI to render \`\`\`ui blocks (see InteractiveUIBlock).
+ */
+export interface DynamicUIPluginConfig {
+  interactiveUI?: boolean;
+}
+
 export class DynamicUIPlugin implements IContextPluginNextGen {
   readonly name = 'dynamic_ui';
 
+  private readonly _interactiveUIEnabled: boolean;
+  private _instructionsCache: string | null = null;
   private _instructionsTokenCache: number | null = null;
 
-  // Accept optional config for PluginRegistry factory compatibility
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  constructor(_config?: Record<string, unknown>) {}
+  constructor(config?: DynamicUIPluginConfig | Record<string, unknown>) {
+    this._interactiveUIEnabled = (config as DynamicUIPluginConfig | undefined)?.interactiveUI === true;
+  }
 
   // --- Instructions (the only thing this plugin provides) ---
 
   getInstructions(): string {
-    return DYNAMIC_UI_INSTRUCTIONS;
+    if (this._instructionsCache === null) {
+      this._instructionsCache = this._interactiveUIEnabled
+        ? SIDE_PANEL_INSTRUCTIONS + INTERACTIVE_UI_INSTRUCTIONS
+        : SIDE_PANEL_INSTRUCTIONS;
+    }
+    return this._instructionsCache;
   }
 
   getInstructionsTokenSize(): number {
     if (this._instructionsTokenCache === null) {
-      this._instructionsTokenCache = estimateTokens(DYNAMIC_UI_INSTRUCTIONS);
+      this._instructionsTokenCache = estimateTokens(this.getInstructions());
     }
     return this._instructionsTokenCache;
   }
